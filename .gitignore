@@ -1,0 +1,8 @@
+.github/workflows/testgame/native/
+.github/workflows/testgame/success
+.vscode/
+logs/
+tmp/
+
+dragonruby
+font.ttf
