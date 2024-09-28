@@ -58,6 +58,56 @@ static void dump_float(mrb_state *mrb, mrb_value x) {
            obj->f);
 }
 
+static void dump_string(mrb_state *mrb, mrb_value x) {
+    struct RString *obj = mrb_ptr(x);
+    const char *cls = api->mrb_class_name(mrb, obj->c);
+
+    if (RSTR_EMBED_P(obj)) {
+        printf("{ c: %s, gcnext: %p, tt: %s, color: %s, flags: %s, len: %lld, embedded: \"%s\" }\n",
+               cls,
+               obj->gcnext,
+               ttypes[obj->tt],
+               BITS(obj->color, 3),
+               BITS(obj->flags, 32),
+               RSTR_EMBED_LEN(obj),
+               RSTR_EMBED_PTR(obj));
+    } else if (RSTR_SHARED_P(obj)) {
+        printf("{ c: %s, gcnext: %p, tt: %s, color: %s, flags: %s, len: %lld, ptr: \"%s\", shared: { refcnt: %d, capa: %lld, ptr: \"%s\" } }\n",
+               cls,
+               obj->gcnext,
+               ttypes[obj->tt],
+               BITS(obj->color, 3),
+               BITS(obj->flags, 32),
+               obj->as.heap.len,
+               obj->as.heap.ptr,
+               obj->as.heap.aux.shared->refcnt,
+               obj->as.heap.aux.shared->capa,
+               obj->as.heap.aux.shared->ptr);
+    } else if (RSTR_FSHARED_P(obj)) {
+        printf("{ c: %s, gcnext: %p, tt: %s, color: %s, flags: %s, len: %lld, ptr: \"%s\", fshared: %p }\n",
+               cls,
+               obj->gcnext,
+               ttypes[obj->tt],
+               BITS(obj->color, 3),
+               BITS(obj->flags, 32),
+               obj->as.heap.len,
+               obj->as.heap.ptr,
+               obj->as.heap.aux.fshared);
+        printf("  fshared: ");
+        dump_string(mrb, mrb_obj_value(obj->as.heap.aux.fshared));
+    } else {
+        printf("{ c: %s, gcnext: %p, tt: %s, color: %s, flags: %s, len: %lld, ptr: \"%s\", capa: %lld }\n",
+               cls,
+               obj->gcnext,
+               ttypes[obj->tt],
+               BITS(obj->color, 3),
+               BITS(obj->flags, 32),
+               obj->as.heap.len,
+               obj->as.heap.ptr,
+               obj->as.heap.aux.capa);
+    }
+}
+
 static char *dump_ivs(mrb_state *mrb, struct iv_tbl *tbl) {
     if (tbl == NULL) return "NULL";
     if (!dump_buffer) dump_buffer = malloc(1024);

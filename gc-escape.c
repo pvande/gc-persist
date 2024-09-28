@@ -75,6 +75,28 @@ mrb_value gc_escape(mrb_state *mrb, mrb_value obj) {
             api->mrb_hash_set(mrb, escaped_index, copy, copy);
             break;
         }
+        case MRB_TT_STRING: {
+            struct RString *raw = RSTRING(obj);
+
+            if (RSTR_EMBED_P(raw)) {
+                leaked->as.string = *raw;
+            } else {
+                leaked->as.basic = *basic;
+
+                size_t len = RSTR_LEN(raw);
+                if (RSTR_SHARED_P(raw)) {
+                    leaked->as.string.as.heap.aux.shared->refcnt++;
+                } else {
+                    leaked->as.string.as.heap.ptr = api->mrb_malloc(mrb, len + 1);
+                    leaked->as.string.as.heap.len = len;
+                    leaked->as.string.as.heap.aux.capa = 0;
+                    memcpy(leaked->as.string.as.heap.ptr, RSTR_PTR(raw), len + 1);
+                    RSTR_SET_TYPE_FLAG(&leaked->as.string, NOFREE);
+                }
+            }
+
+            break;
+        }
         case MRB_TT_HASH: {
             struct RHash *raw = RHASH(obj);
             leaked->as.hash = *raw;
@@ -139,6 +161,11 @@ mrb_value gc_escape(mrb_state *mrb, mrb_value obj) {
     //     case MRB_TT_FLOAT: {
     //         printf("orig: "); dump_float(mrb, obj);
     //         printf("copy: "); dump_float(mrb, copy);
+    //         break;
+    //     }
+    //     case MRB_TT_STRING: {
+    //         printf("orig: "); dump_string(mrb, obj);
+    //         printf("copy: "); dump_string(mrb, copy);
     //         break;
     //     }
     //     case MRB_TT_HASH: {

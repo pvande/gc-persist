@@ -13,6 +13,12 @@ struct RVALUE {
     } as;
 };
 
+typedef struct mrb_shared_string {
+    int refcnt;
+    mrb_int capa;
+    char *ptr;
+} mrb_shared_string;
+
 struct iv_elem {
     mrb_sym key;
     mrb_value val;
@@ -35,4 +41,5 @@ typedef struct hash_table {
 } hash_table;
 
 static drb_api_t *api;
+
 #endif

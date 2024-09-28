@@ -30,6 +30,7 @@ begin
   assert_equal(true, GC.respond_to?(:escape), "Library failed to load")
 
   require "app/float_test.rb"
+  require "app/string_test.rb"
   require "app/hash_test.rb"
 rescue Exception => e
   __puts__ e.message
