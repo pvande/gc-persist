@@ -41,9 +41,8 @@ assert_equal(1, a[:x], "Escaped hash still references the original hash")
 assert_equal(1, b[:x], "Escaped hash still references the original hash")
 assert_equal(1, c[:x], "Escaped hash still references the original hash")
 
-# @FIXME: Deduplication
-# assert_equal(a.object_id, b.object_id, "Escaped hashes aren't deduplicated")
-# assert_equal(a.object_id, c.object_id, "Escaped hashes aren't deduplicated")
+assert_equal(a.object_id, b.object_id, "Escaped hashes aren't deduplicated")
+assert_equal(a.object_id, c.object_id, "Escaped hashes aren't deduplicated")
 
 # Testing Large Hash Escape
 letters = ("a".."z")
@@ -83,6 +82,21 @@ assert_equal(23, a[:x], "Escaped hash still references the original hash")
 assert_equal(23, b[:x], "Escaped hash still references the original hash")
 assert_equal(23, c[:x], "Escaped hash still references the original hash")
 
-# @FIXME: Deduplication
-# assert_equal(a.object_id, b.object_id, "Escaped hashes aren't deduplicated")
-# assert_equal(a.object_id, c.object_id, "Escaped hashes aren't deduplicated")
+assert_equal(a.object_id, b.object_id, "Escaped hashes aren't deduplicated")
+assert_equal(a.object_id, c.object_id, "Escaped hashes aren't deduplicated")
+
+# Testing Defaulted Hash Escape
+before, after, (original, a, b, c) = experiment do
+  canonical = Hash.new({})
+  [ canonical, ESCAPE(canonical), ESCAPE(canonical), ESCAPE(canonical) ]
+end
+
+assert_equal(before[:T_HASH] + 2, after[:T_HASH], "Escaped hash values are being tracked by the GC")
+
+original[:x][:i] = 10
+assert_equal({}, a[:x], "Escaped hash still references the original hash")
+assert_equal({}, b[:x], "Escaped hash still references the original hash")
+assert_equal({}, c[:x], "Escaped hash still references the original hash")
+
+assert_equal(a.object_id, b.object_id, "Escaped hashes aren't deduplicated")
+assert_equal(a.object_id, c.object_id, "Escaped hashes aren't deduplicated")

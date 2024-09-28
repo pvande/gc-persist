@@ -15,6 +15,8 @@ char *bits(char buf[TO_BASE_N], unsigned i, int nbits) {
     return s;
 }
 
+static char *dump_buffer;
+
 static char *ttypes[] = {
     "MRB_TT_FALSE",
     "MRB_TT_TRUE",
@@ -42,7 +44,7 @@ static char *ttypes[] = {
     "MRB_TT_BREAK",
     "MRB_TT_MAXDEFINE"};
 
-#define inspect(o) puts(api->mrb_str_to_cstr(mrb, api->mrb_inspect(mrb, o)))
+#define inspect(o) puts(api->mrb_str_to_cstr(mrb, api->mrb_inspect(mrb, (o))))
 
 static void dump_float(mrb_state *mrb, mrb_value x) {
     struct RFloat *obj = mrb_ptr(x);
@@ -56,7 +58,6 @@ static void dump_float(mrb_state *mrb, mrb_value x) {
            obj->f);
 }
 
-static char *dump_buffer;
 static char *dump_ivs(mrb_state *mrb, struct iv_tbl *tbl) {
     if (tbl == NULL) return "NULL";
     if (!dump_buffer) dump_buffer = malloc(1024);
