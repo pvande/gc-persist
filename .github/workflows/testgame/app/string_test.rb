@@ -7,7 +7,7 @@ assert_equal("a" * 48, ESCAPE("a" * 48), "Escaped long strings are broken")
 
 # Verifying Short String Behavior
 before, after, list = experiment { 100.times.map { |i| i.to_s } }
-assert_equal(before[:T_STRING] + 100, after[:T_STRING], "Strings are not tracked by the GC")
+assert_equal(before[:T_STRING].to_i + 100, after[:T_STRING], "Strings are not tracked by the GC")
 
 # Testing Short String Escape
 before, after, list = experiment { 100.times.map { |i| ESCAPE(i.to_s) } }

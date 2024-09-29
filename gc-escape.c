@@ -97,6 +97,15 @@ mrb_value gc_escape(mrb_state *mrb, mrb_value obj) {
 
             break;
         }
+        case MRB_TT_RANGE: {
+            struct RRange *raw = (struct RRange *)basic;
+            leaked->as.range = *raw;
+
+            RANGE_BEG(&leaked->as.range) = gc_escape(mrb, RANGE_BEG(raw));
+            RANGE_END(&leaked->as.range) = gc_escape(mrb, RANGE_END(raw));
+
+            break;
+        }
         case MRB_TT_HASH: {
             struct RHash *raw = RHASH(obj);
             leaked->as.hash = *raw;

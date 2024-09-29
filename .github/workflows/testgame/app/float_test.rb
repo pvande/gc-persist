@@ -2,7 +2,7 @@ __puts__ "Testing Floats"
 
 # Verifying Float Behavior
 before, after, list = experiment { 100.times.map { |i| i.to_f } }
-assert_equal(before[:T_FLOAT] + 100, after[:T_FLOAT], "Floats are not tracked by the GC")
+assert_equal(before[:T_FLOAT].to_i + 100, after[:T_FLOAT], "Floats are not tracked by the GC")
 
 expected_sum = list.sum
 

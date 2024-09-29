@@ -9,7 +9,7 @@ assert_equal(3.0, ESCAPE(Hash.new(3.0))[:x], "Hashes aren't escaping default val
 
 # Verifying Small Hash Behavior
 before, after, list = experiment { 2048.times.map { |i| { x: i } } }
-assert_equal(before[:T_HASH] + 2048, after[:T_HASH], "Hashes are not tracked by the GC")
+assert_equal(before[:T_HASH].to_i + 2048, after[:T_HASH], "Hashes are not tracked by the GC")
 
 # Testing Small Hash Escape
 before, after, list = experiment { 2048.times.map { |i| ESCAPE(x: i) } }
@@ -34,7 +34,7 @@ before, after, (original, a, b, c) = experiment do
   [ canonical, ESCAPE(canonical), ESCAPE(canonical), ESCAPE(canonical) ]
 end
 
-assert_equal(before[:T_HASH] + 1, after[:T_HASH], "Escaped hash values are being tracked by the GC")
+assert_equal(before[:T_HASH].to_i + 1, after[:T_HASH], "Escaped hash values are being tracked by the GC")
 
 original[:x] = 10
 assert_equal(1, a[:x], "Escaped hash still references the original hash")
@@ -75,7 +75,7 @@ before, after, (original, a, b, c) = experiment do
   [ canonical, ESCAPE(canonical), ESCAPE(canonical), ESCAPE(canonical) ]
 end
 
-assert_equal(before[:T_HASH] + 1, after[:T_HASH], "Escaped hash values are being tracked by the GC")
+assert_equal(before[:T_HASH].to_i + 1, after[:T_HASH], "Escaped hash values are being tracked by the GC")
 
 original[:x] = 10
 assert_equal(23, a[:x], "Escaped hash still references the original hash")
@@ -91,7 +91,7 @@ before, after, (original, a, b, c) = experiment do
   [ canonical, ESCAPE(canonical), ESCAPE(canonical), ESCAPE(canonical) ]
 end
 
-assert_equal(before[:T_HASH] + 2, after[:T_HASH], "Escaped hash values are being tracked by the GC")
+assert_equal(before[:T_HASH].to_i + 2, after[:T_HASH], "Escaped hash values are being tracked by the GC")
 
 original[:x][:i] = 10
 assert_equal({}, a[:x], "Escaped hash still references the original hash")
