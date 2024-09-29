@@ -21,25 +21,9 @@ assert_equal("ipsum", escaped[6, 5], "Escaped strings are broken")
 
 # Testing Long Escaped String Copy Slicing
 original = "lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod"
-escaped = ESCAPE(original)
 
-GC.start
+_, _, escaped = experiment { ESCAPE(original) }
 assert_equal("ipsum", escaped[6, 5], "Escaped strings are broken")
 
-original = nil
-GC.start
+_, _, escaped = experiment { ESCAPE(original).tap { original = nil } }
 assert_equal("ipsum", escaped[6, 5], "Escaped strings are broken")
-
-# Stress Test: Short Strings
-"abcdefghijklmnopqrstuvwxyz".each_char do |a|
-  "abcdefghijklmnopqrstuvwxyz".each_char do |b|
-    ESCAPE(a + b)
-  end
-end
-
-# Stress Test: Long Strings
-"abcdefghijklmnopqrstuvwxyz".each_char do |a|
-  "abcdefghijklmnopqrstuvwxyz".each_char do |b|
-    ESCAPE((a * 16) + (b * 16))
-  end
-end

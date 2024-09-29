@@ -3,15 +3,32 @@ $gtk.ffi_misc.gtk_dlopen("gc-escape")
 $before = {}
 $after = {}
 $allocated = nil
+$retain = []
 
 def self.experiment(&block)
   $allocated = nil
-  GC.start
+
+  # Flush the GC arena and take count.
   ObjectSpace.count_objects($before)
 
+  # Run the experiment.
   $allocated = yield
 
-  GC.start
+  # Flush the GC arena.
+  # This writes an identifiable value to every free slot in the arena; if data
+  # from the arena is still referenced by the experiment, this will make
+  # identification easier.
+  ObjectSpace.count_objects($after)
+  GC.disable
+  idx, target = 0, $after[:FREE]
+  while idx < target
+    $retain[idx] = -9000.0
+    idx += 1
+  end
+  GC.enable
+  $retain.clear
+
+  # Flush the GC arena and count again.
   ObjectSpace.count_objects($after)
 
   return $before, $after, $allocated
