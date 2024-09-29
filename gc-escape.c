@@ -106,6 +106,21 @@ mrb_value gc_escape(mrb_state *mrb, mrb_value obj) {
 
             break;
         }
+        case MRB_TT_ARRAY: {
+            struct RArray *raw = RARRAY(obj);
+            leaked->as.array = *raw;
+
+            size_t len = ARY_LEN(raw);
+            if (!ARY_EMBED_P(&leaked->as.array))
+                leaked->as.array.as.heap.ptr = malloc(sizeof(mrb_value) * len);
+
+            mrb_value *orig_ptr = ARY_PTR(raw);
+            mrb_value *copy_ptr = ARY_PTR(&leaked->as.array);
+            for (size_t i = 0; i < len; i++)
+                copy_ptr[i] = gc_escape(mrb, orig_ptr[i]);
+
+            break;
+        }
         case MRB_TT_HASH: {
             struct RHash *raw = RHASH(obj);
             leaked->as.hash = *raw;
