@@ -1,6 +1,7 @@
 .github/workflows/testgame/native/
 .github/workflows/testgame/success
 .vscode/
+include/
 logs/
 tmp/
 
