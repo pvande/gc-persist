@@ -49,6 +49,7 @@ begin
   require "app/float_test.rb"
   require "app/string_test.rb"
   require "app/range_test.rb"
+  require "app/object_test.rb"
   require "app/array_test.rb"
   require "app/hash_test.rb"
 rescue Exception => e

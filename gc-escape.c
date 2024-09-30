@@ -106,6 +106,13 @@ mrb_value gc_escape(mrb_state *mrb, mrb_value obj) {
 
             break;
         }
+        case MRB_TT_OBJECT: {
+            struct RObject *raw = (struct RObject *)basic;
+            leaked->as.object = *raw;
+            leaked->as.object.iv = gc_escape_iv_tbl_clone(mrb, raw->iv);
+
+            break;
+        }
         case MRB_TT_ARRAY: {
             struct RArray *raw = RARRAY(obj);
             leaked->as.array = *raw;
